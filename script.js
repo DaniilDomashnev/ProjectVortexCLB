@@ -925,6 +925,154 @@ function initToolbox() {
 	}
 }
 
+// ==========================================
+// --- 5. МОБИЛЬНАЯ БИБЛИОТЕКА (БИБЛИОТЕКА БЛОКОВ) ---
+// ==========================================
+
+function initMobileLibrary() {
+    // Проверка на наличие элементов перед работой
+    const fab = document.getElementById('fabAddBlock');
+    const overlay = document.getElementById('library-overlay');
+    const closeBtn = document.getElementById('btnCloseLib');
+    const catContainer = document.getElementById('libCategories');
+    const gridContainer = document.getElementById('libGrid');
+
+    if (!fab || !overlay) return; // Если элементов нет в HTML, выходим
+
+    // Открытие меню
+    fab.onclick = () => {
+        overlay.classList.remove('hidden');
+        renderLibCategories(); 
+    }
+
+    // Закрытие меню
+    if (closeBtn) closeBtn.onclick = () => overlay.classList.add('hidden');
+
+    // Рендер категорий (Слева)
+    function renderLibCategories() {
+        catContainer.innerHTML = '';
+        
+        const categories = [...new Set(BLOCK_DEFINITIONS.map(b => b.category))];
+        if(!categories.includes('Шаблоны')) categories.push('Шаблоны');
+
+        let isFirst = true;
+
+        categories.forEach(cat => {
+            const el = document.createElement('div');
+            el.className = 'lib-cat-item';
+            
+            let icon = 'ri-function-line';
+            if(cat === 'События') icon = 'ri-flag-fill';
+            if(cat === 'Окно') icon = 'ri-window-line';
+            if(cat === 'Физика') icon = 'ri-basketball-line';
+            if(cat === 'Логика') icon = 'ri-git-branch-line';
+            if(cat === 'Внешность') icon = 'ri-palette-line';
+            if(cat === 'Управление') icon = 'ri-gamepad-line';
+            if(cat === 'Текст') icon = 'ri-text';
+            if(cat === 'Шаблоны') icon = 'ri-layout-masonry-line';
+
+            el.innerHTML = `<i class="${icon}"></i><span>${cat}</span>`;
+            
+            el.onclick = () => {
+                document.querySelectorAll('.lib-cat-item').forEach(i => i.classList.remove('active'));
+                el.classList.add('active');
+                renderLibBlocks(cat);
+            };
+
+            catContainer.appendChild(el);
+
+            if(isFirst) {
+                el.click(); 
+                isFirst = false;
+            }
+        });
+    }
+
+    // Рендер блоков (Справа)
+    function renderLibBlocks(category) {
+        gridContainer.innerHTML = '';
+
+        let blocks = BLOCK_DEFINITIONS.filter(b => b.category === category);
+        
+        // Добавляем кастомные шаблоны
+        if(category === 'Шаблоны') {
+            Object.keys(customTemplates).forEach(key => {
+                const tmpl = customTemplates[key];
+                blocks.push({
+                    id: key,
+                    label: tmpl.name,
+                    icon: 'ri-star-fill',
+                    color: '#FFD700',
+                    isCustom: true
+                });
+            });
+        }
+
+        blocks.forEach(def => {
+            const card = document.createElement('div');
+            card.className = 'lib-block-card';
+            card.innerHTML = `
+                <div class="lib-block-icon">
+                    <i class="${def.icon}" style="color:${def.color}"></i>
+                </div>
+                <div class="lib-block-name">${def.label}</div>
+            `;
+            
+            // ПРИ КЛИКЕ - СОЗДАЕМ БЛОК В ЦЕНТРЕ
+            card.onclick = () => {
+                addBlockToCenter(def);
+                overlay.classList.add('hidden');
+            };
+
+            gridContainer.appendChild(card);
+        });
+    }
+
+    // Логика добавления в центр экрана
+    function addBlockToCenter(def) {
+        // Получаем размеры холста
+        const rect = canvas.getBoundingClientRect();
+        
+        // Центр видимой области с учетом сдвига камеры (panX, panY)
+        // Формула: (Половина экрана) - (Текущий сдвиг) - (Половина ширины блока ~100px)
+        const centerX = (-panX + rect.width / 2) - 90; 
+        const centerY = (-panY + rect.height / 2) - 30;
+
+        if (def.isCustom) {
+            // Пользовательский шаблон
+            const templateData = customTemplates[def.id].data;
+            let minX = Infinity, minY = Infinity;
+            templateData.forEach(b => {
+                if (b.x < minX) minX = b.x;
+                if (b.y < minY) minY = b.y;
+            });
+            templateData.forEach(blockData => {
+                createBlock(blockData.type, 0, 0, {
+                    ...blockData,
+                    x: centerX + (blockData.x - minX),
+                    y: centerY + (blockData.y - minY)
+                });
+            });
+        } else if (TEMPLATES[def.id]) {
+            // Встроенный шаблон
+             TEMPLATES[def.id].forEach((b, i) => {
+                 createBlock(b.type, 0, 0, {
+                     ...b,
+                     x: centerX + (b.x || i*10), 
+                     y: centerY + (b.y || i*10)
+                 });
+             })
+        } else {
+            // Обычный блок
+            createBlock(def.id, 0, 0, {
+                values: def.inputs ? def.inputs.map(i => i.default) : [],
+                x: centerX,
+                y: centerY
+            });
+        }
+    }
+}
+
 function getActiveScene() {
 	return projectData.scenes.find(s => s.id === activeSceneId)
 }

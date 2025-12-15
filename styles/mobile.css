@@ -1,78 +1,82 @@
 @media screen and (max-width: 768px) {
     
-    /* 1. Делаем страницу прокручиваемой */
-    body {
-        height: auto !important;
-        overflow-y: auto !important;
-        position: relative;
+    /* 1. Блокируем скролл страницы, чтобы не мешал драг-н-дропу */
+    html, body {
+        height: 100%;
+        overflow: hidden !important; 
+        position: fixed;
+        width: 100%;
     }
 
+    /* Делаем вертикальный флекс на весь экран */
     .layout {
-        flex-direction: column !important;
-        height: auto !important;
         display: flex !important;
+        flex-direction: column !important;
+        height: 100vh !important;
+        width: 100vw !important;
     }
 
-    /* 2. Холст сверху (50% экрана) */
+    /* 2. Холст занимает 60% высоты и он фиксирован */
     .canvas {
         order: 1;
-        height: 50vh !important; 
-        min-height: 350px;
+        flex: 6 !important; /* 60% высоты */
         width: 100% !important;
         border-bottom: 2px solid #333;
+        position: relative;
+        touch-action: none; /* Отключает жесты браузера на холсте */
     }
 
-    /* 3. Сайдбар (Сцены/Объекты) посередине */
+    /* 3. Сайдбар (Сцены) внизу, занимает остаток места */
     .sidebar {
         order: 2;
+        flex: 4 !important; /* 40% высоты */
         width: 100% !important;
-        height: auto !important;
         border-right: none !important;
-        border-bottom: 1px solid #333;
-        max-height: 40vh; /* Ограничиваем высоту */
+        border-top: 1px solid #333;
+        overflow-y: auto !important; /* Скроллим только этот список */
+        padding-bottom: 80px; /* Место под кнопку FAB */
     }
 
-    /* 4. Инструменты (Блоки) снизу */
+    /* Внутри сайдбара делаем элементы крупнее */
+    .sidebar .list-item { 
+        padding: 15px 20px !important;
+        font-size: 16px !important;
+        justify-content: flex-start !important;
+    }
+    
+    /* Возвращаем текст в сайдбар (в прошлом коде я его скрывал, но для удобства лучше вернуть) */
+    .sidebar .list-item i {
+        font-size: 20px; 
+        margin-right: 10px;
+    }
+
+    /* 4. Инструменты (Toolbox) СКРЫВАЕМ ПОЛНОСТЬЮ */
+    /* Мы используем кнопку + (FAB), поэтому старая панель не нужна */
     .toolbox {
-        order: 3;
-        width: 100% !important;
-        height: auto !important;
-        border-left: none !important;
-        min-height: 300px;
+        display: none !important;
     }
 
-    /* Увеличиваем кнопки для пальцев */
-    .icon-btn, .zoom-btn {
-        width: 44px !important;
-        height: 44px !important;
+    /* --- Прочие фиксы --- */
+
+    /* Шапка компактная */
+    header {
+        padding: 0 10px !important;
+    }
+    .brand { font-size: 14px !important; }
+    
+    /* Кнопка запуска ярче и больше */
+    .play-btn {
+        padding: 0 15px !important;
     }
 
-    .list-item, .tool-item {
-        padding: 15px !important; /* Большие отступы для пальца */
-        font-size: 14px !important;
-    }
-
-    /* Прячем лишний текст в шапке */
-    .brand { font-size: 0 !important; }
-    .brand i { font-size: 24px !important; margin: 0 !important; }
-
-    /* Окно экспорта на весь экран */
+    /* Окно экспорта и промпты на 95% ширины */
     .export-window, .modal-window {
-        width: 95% !important;
-        max-width: 95% !important;
+        width: 90% !important;
+        max-width: 90% !important;
     }
-}
-
-@media (max-width: 768px) {
+    
+    /* Увеличиваем зоны нажатия у блоков */
     .node-header {
-        cursor: grab;
-        padding: 10px;
-        font-size: 14px;
-    }
-
-    .tool-item {
-        padding: 12px;
-        font-size: 14px;
+        padding: 12px !important; /* Пальцем легче попасть */
     }
 }
-
