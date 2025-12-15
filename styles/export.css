@@ -1,0 +1,198 @@
+/* --- АНИМАЦИИ --- */
+@keyframes slideUpFade {
+    from {
+        opacity: 0;
+        transform: translateY(20px) scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+@keyframes pulseGlow {
+    0% { box-shadow: 0 0 0 0 rgba(0, 230, 118, 0.4); }
+    70% { box-shadow: 0 0 0 10px rgba(0, 230, 118, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(0, 230, 118, 0); }
+}
+
+/* --- МОДАЛЬНОЕ ОКНО --- */
+.export-window {
+    background: linear-gradient(145deg, #1e1e1e, #141414); /* Глубокий градиент */
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+    padding: 0; /* Убираем стандартные отступы */
+    overflow: hidden;
+    width: 420px;
+    max-width: 90vw;
+}
+
+.modal-header {
+    padding: 20px 25px;
+    background: rgba(255, 255, 255, 0.03);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.modal-title {
+    font-size: 18px;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.modal-title i {
+    color: var(--accent);
+}
+
+.modal-subtitle {
+    font-size: 12px;
+    color: #888;
+    margin-top: 4px;
+    margin-left: 26px; /* Отступ под иконкой */
+}
+
+/* --- СПИСОК КАРТОЧЕК --- */
+.export-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 20px 25px;
+}
+
+/* --- КАРТОЧКА ЭКСПОРТА --- */
+.export-card {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 12px;
+    background: #1a1a1a;
+    border: 1px solid #333;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    position: relative;
+    overflow: hidden;
+    text-align: left;
+    
+    /* Начальное состояние для анимации */
+    opacity: 0; 
+    transform: translateY(10px);
+}
+
+/* Анимация при открытии (класс .active у родителя запустит это) */
+.modal-overlay.active .export-card {
+    animation: slideUpFade 0.5s forwards;
+    animation-delay: var(--delay);
+}
+
+/* Эффекты наведения */
+.export-card:hover {
+    background: #252525;
+    border-color: #555;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+}
+
+.export-card:hover .card-action i {
+    color: var(--accent);
+    transform: translateY(2px);
+}
+
+/* Нажатие */
+.export-card:active {
+    transform: scale(0.98);
+}
+
+/* Иконки форматов (Квадраты слева) */
+.card-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    flex-shrink: 0;
+}
+
+.html-icon {
+    background: rgba(228, 77, 38, 0.1);
+    color: #e44d26;
+}
+
+.win-icon {
+    background: rgba(0, 120, 215, 0.1);
+    color: #0078d7;
+}
+
+.android-icon {
+    background: rgba(61, 220, 132, 0.1);
+    color: #3ddc84;
+}
+
+/* Текстовая часть */
+.card-info {
+    flex: 1;
+}
+
+.card-title {
+    color: #eee;
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 3px;
+}
+
+.card-desc {
+    color: #666;
+    font-size: 11px;
+    line-height: 1.3;
+}
+
+.export-card:hover .card-desc {
+    color: #999;
+}
+
+/* Иконка действия (стрелка) */
+.card-action {
+    color: #444;
+    font-size: 18px;
+    transition: 0.3s;
+}
+
+/* --- DISABLED STATE --- */
+.export-card.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    filter: grayscale(1);
+    border-style: dashed;
+}
+.export-card.disabled:hover {
+    transform: none;
+    background: #1a1a1a;
+    border-color: #333;
+}
+
+.card-badge {
+    background: #333;
+    color: #888;
+    font-size: 9px;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-weight: bold;
+    letter-spacing: 0.5px;
+}
+
+/* --- FOOTER --- */
+.modal-footer {
+    padding: 15px 25px;
+    border-top: 1px solid #222;
+    background: #181818;
+    display: flex;
+    justify-content: flex-end;
+}
+
+#export-overlay {
+    backdrop-filter: blur(5px); /* Размытие фона за окном */
+    background: rgba(0, 0, 0, 0.7);
+}

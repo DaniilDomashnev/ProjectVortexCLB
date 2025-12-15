@@ -1,0 +1,78 @@
+@media screen and (max-width: 768px) {
+    
+    /* 1. Делаем страницу прокручиваемой */
+    body {
+        height: auto !important;
+        overflow-y: auto !important;
+        position: relative;
+    }
+
+    .layout {
+        flex-direction: column !important;
+        height: auto !important;
+        display: flex !important;
+    }
+
+    /* 2. Холст сверху (50% экрана) */
+    .canvas {
+        order: 1;
+        height: 50vh !important; 
+        min-height: 350px;
+        width: 100% !important;
+        border-bottom: 2px solid #333;
+    }
+
+    /* 3. Сайдбар (Сцены/Объекты) посередине */
+    .sidebar {
+        order: 2;
+        width: 100% !important;
+        height: auto !important;
+        border-right: none !important;
+        border-bottom: 1px solid #333;
+        max-height: 40vh; /* Ограничиваем высоту */
+    }
+
+    /* 4. Инструменты (Блоки) снизу */
+    .toolbox {
+        order: 3;
+        width: 100% !important;
+        height: auto !important;
+        border-left: none !important;
+        min-height: 300px;
+    }
+
+    /* Увеличиваем кнопки для пальцев */
+    .icon-btn, .zoom-btn {
+        width: 44px !important;
+        height: 44px !important;
+    }
+
+    .list-item, .tool-item {
+        padding: 15px !important; /* Большие отступы для пальца */
+        font-size: 14px !important;
+    }
+
+    /* Прячем лишний текст в шапке */
+    .brand { font-size: 0 !important; }
+    .brand i { font-size: 24px !important; margin: 0 !important; }
+
+    /* Окно экспорта на весь экран */
+    .export-window, .modal-window {
+        width: 95% !important;
+        max-width: 95% !important;
+    }
+}
+
+@media (max-width: 768px) {
+    .node-header {
+        cursor: grab;
+        padding: 10px;
+        font-size: 14px;
+    }
+
+    .tool-item {
+        padding: 12px;
+        font-size: 14px;
+    }
+}
+

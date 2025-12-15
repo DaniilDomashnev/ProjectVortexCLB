@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Ecrous Engine</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="styles/export.css">
+    <link rel="stylesheet" href="styles/mobile.css">
+    <link rel="icon" type="image/png" href="../public/vite.jpg">
+</head>
+<body>
+    <header>
+        <div class="header-left">
+            <div class="brand">
+                <i class="ri-settings-3-line" style="font-size:20px; color:#00e676;"></i>
+                Ecrous Engine
+            </div>
+
+            <div class="menu-bar">
+                <div class="menu-item" id="menuFile">
+                    Файл
+                    <i class="ri-arrow-down-s-line"></i>
+
+                    <div class="menu-dropdown">
+                        <div class="menu-entry" id="btnSave">
+                            <i class="ri-save-3-line"></i>
+                            Сохранить проект
+                            <span>Ctrl+S</span>
+                        </div>
+
+                        <div class="menu-entry" id="btnLoad">
+                            <i class="ri-folder-open-line"></i>
+                            Загрузить проект
+                        </div>
+
+                        <div class="menu-separator"></div>
+
+                        <div class="menu-entry" id="btnExport">
+                            <div class="menu-entry-left">
+                                <i class="ri-archive-line"></i>
+                                Экспорт
+                            </div>
+                            <i class="ri-arrow-right-s-line menu-entry-arrow"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="header-controls">
+            <button id="btnRun" class="play-btn">
+                <i class="ri-play-fill"></i> ЗАПУСК
+            </button>
+        </div>
+    </header>
+
+    <div class="layout">
+        <div class="sidebar">
+            <div class="section-title">
+                <span><i class="ri-movie-line"></i> СЦЕНЫ</span>
+                <i class="ri-add-line action-icon" id="btnAddScene" title="Новая сцена"></i>
+            </div>
+            <div class="list-container" id="sceneList">
+            </div>
+
+            <div class="divider"></div>
+
+            <div class="section-title">
+                <span><i class="ri-box-3-line"></i> ОБЪЕКТЫ</span>
+                <i class="ri-add-line action-icon" id="btnAddObject" title="Новый объект"></i>
+            </div>
+            <div class="list-container" id="objectList">
+            </div>
+
+            <div class="panel-footer-info">
+                <div><i class="ri-drag-move-2-line"></i> <span id="current-context">Нет выбора</span></div>
+            </div>
+
+            <div class="template-controls" style="margin-top: 10px; padding: 10px; border-top: 1px solid #444;">
+                <p style="color: #888; font-size: 12px; margin-bottom: 5px;">Мои шаблоны:</p>
+
+                <button onclick="createTemplateFromCurrent()" title="Сохранить текущие блоки как новый шаблон">
+                    <i class="ri-add-box-line"></i> В шаблон
+                </button>
+
+                <button onclick="exportTemplates()" title="Скачать файл с моими шаблонами">
+                    <i class="ri-download-cloud-line"></i> Экспорт
+                </button>
+
+                <button onclick="importTemplates()" title="Загрузить шаблоны из файла">
+                    <i class="ri-upload-cloud-line"></i> Импорт
+                </button>
+            </div>
+        </div>
+
+        <div class="canvas" id="mainCanvas">
+            <div id="canvas-container"></div>
+
+            <div class="canvas-controls">
+                <div class="hint-text"><i class="ri-mouse-line"></i> ПКМ: Меню | Колесо: Двигать</div>
+                <button class="zoom-btn" id="resetView" title="Сброс камеры"><i class="ri-focus-3-line"></i></button>
+            </div>
+        </div>
+
+        <div class="toolbox">
+            <div class="panel-header"><i class="ri-function-line"></i> Инструменты</div>
+            <div id="toolboxContent"></div>
+        </div>
+    </div>
+
+    <div id="game-overlay" class="hidden">
+        <div class="game-window">
+            <div class="game-header">
+                <div style="display:flex; gap:10px; align-items:center;">
+                    <i class="ri-gamepad-line" style="color:#00e676"></i>
+                    <span>ИГРОВОЙ ПРОЦЕСС</span>
+                </div>
+                <button id="btnCloseGame" class="close-game-btn"><i class="ri-close-line"></i></button>
+            </div>
+            <div id="game-stage"></div>
+            <div id="game-console">
+                <div class="console-line system">> Движок готов к работе...</div>
+            </div>
+        </div>
+    </div>
+
+    <div id="custom-prompt-overlay" class="modal-overlay hidden">
+        <div class="modal-window">
+            <div class="modal-title" id="modalTitle">Ввод данных</div>
+            <div class="modal-message" id="modalMessage">Введите название:</div>
+
+            <input type="text" id="modalInput" class="modal-input" autocomplete="off">
+
+            <div class="modal-buttons">
+                <button id="btnModalConfirm" class="modal-btn primary">Продолжить</button>
+                <button id="btnModalCancel" class="modal-btn secondary">Отмена</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="export-overlay" class="modal-overlay">
+        <div class="modal-window export-window">
+            <div class="modal-header">
+                <div class="modal-title"><i class="ri-share-forward-fill"></i> Экспорт проекта</div>
+                <div class="modal-subtitle">Выберите формат сборки вашей игры</div>
+            </div>
+    
+            <div class="export-list">
+                <button class="export-card" id="exportWindows" style="--delay: 0.1s">
+                    <div class="card-icon html-icon">
+                        <i class="ri-html5-fill"></i>
+                    </div>
+                    <div class="card-info">
+                        <div class="card-title">Web Build (HTML)</div>
+                        <div class="card-desc">Единый файл .html, работает в браузере.</div>
+                    </div>
+                    <div class="card-action">
+                        <i class="ri-download-line"></i>
+                    </div>
+                </button>
+    
+                <button class="export-card" id="exportExe" style="--delay: 0.2s">
+                    <div class="card-icon win-icon">
+                        <i class="ri-windows-fill"></i>
+                    </div>
+                    <div class="card-info">
+                        <div class="card-title">Windows Launcher</div>
+                        <div class="card-desc">ZIP-архив с лаунчером для запуска без браузера.</div>
+                    </div>
+                    <div class="card-action">
+                        <i class="ri-download-line"></i>
+                    </div>
+                </button>
+    
+                <button class="export-card disabled" style="--delay: 0.3s">
+                    <div class="card-icon android-icon">
+                        <i class="ri-android-fill"></i>
+                    </div>
+                    <div class="card-info">
+                        <div class="card-title">Android (APK)</div>
+                        <div class="card-desc">Нативная сборка для мобильных устройств.</div>
+                    </div>
+                    <div class="card-badge">СКОРО</div>
+                </button>
+            </div>
+    
+            <div class="modal-footer">
+                <button class="modal-btn secondary" id="closeExport">Отмена</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+
+    <script src="script.js"></script>
+    <script src="scripts/bar.js"></script>
+    <script src="scripts/export.js"></script>
+    <script src="scripts/mobile.js"></script>
+</body>
+</html>

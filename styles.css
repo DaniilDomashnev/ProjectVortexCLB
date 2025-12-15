@@ -1,0 +1,777 @@
+:root {
+	--bg-canvas: #1a1a1a;
+	--bg-panel: #141414;
+	--bg-header: #1f1f1f;
+	--bg-node: #242424;
+	--bg-input: #111111;
+	--border-light: #333333;
+	--accent: #00e676;
+	--text-main: #eaeaea;
+	--text-dim: #888888;
+	--grad-primary: linear-gradient(135deg, #00e676 0%, #00b0ff 100%);
+}
+
+body {
+	background-color: var(--bg-canvas);
+	color: var(--text-main);
+	font-family: 'Inter', sans-serif;
+	height: 100vh;
+	display: flex;
+	flex-direction: column;
+	overflow: hidden;
+	margin: 0;
+	user-select: none;
+}
+
+/* HEADER */
+header {
+	height: 54px;
+	background: var(--bg-header);
+	border-bottom: 1px solid var(--border-light);
+	display: flex;
+	align-items: center;
+	padding: 0 20px;
+	justify-content: space-between;
+	z-index: 20;
+}
+.brand {
+	font-weight: 700;
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	color: #fff;
+}
+/* .version-tag удален по просьбе */
+.header-controls {
+	display: flex;
+	gap: 8px;
+}
+.icon-btn {
+	background: transparent;
+	border: 1px solid transparent;
+	color: var(--text-dim);
+	width: 34px;
+	height: 34px;
+	border-radius: 6px;
+	cursor: pointer;
+	transition: 0.2s;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+.icon-btn:hover {
+	background: #2a2a2a;
+	color: #fff;
+	border-color: #333;
+}
+.play-btn {
+	background: #00e676;
+	color: #000;
+	border: none;
+	padding: 0 18px;
+	height: 34px;
+	border-radius: 6px;
+	font-weight: 700;
+	cursor: pointer;
+	display: flex;
+	align-items: center;
+	gap: 6px;
+}
+.play-btn:hover {
+	transform: translateY(-1px);
+	box-shadow: 0 0 15px rgba(0, 230, 118, 0.4);
+}
+
+/* LAYOUT */
+.layout {
+	display: flex;
+	flex: 1;
+	height: calc(100vh - 54px);
+}
+.sidebar {
+	width: 240px;
+	background: var(--bg-panel);
+	border-right: 1px solid var(--border-light);
+	display: flex;
+	flex-direction: column;
+	z-index: 10;
+}
+.toolbox {
+	width: 260px;
+	background: var(--bg-panel);
+	border-left: 1px solid var(--border-light);
+	display: flex;
+	flex-direction: column;
+	z-index: 10;
+}
+
+/* SIDEBAR LISTS */
+.section-title {
+	padding: 12px 16px;
+	font-size: 11px;
+	font-weight: 700;
+	color: var(--text-dim);
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	background: rgba(255, 255, 255, 0.02);
+}
+.action-icon {
+	cursor: pointer;
+	padding: 4px;
+	border-radius: 4px;
+	transition: 0.2s;
+}
+.action-icon:hover {
+	background: #333;
+	color: #fff;
+}
+
+.list-container {
+	flex: 1;
+	overflow-y: auto;
+	padding: 5px;
+}
+.divider {
+	height: 1px;
+	background: var(--border-light);
+	margin: 0;
+}
+
+.list-item {
+	padding: 8px 12px;
+	margin-bottom: 2px;
+	border-radius: 4px;
+	font-size: 13px;
+	color: #ccc;
+	cursor: pointer;
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	border: 1px solid transparent;
+}
+.list-item:hover {
+	background: #222;
+}
+.list-item.active {
+	background: rgba(0, 230, 118, 0.1);
+	color: var(--accent);
+	border-color: rgba(0, 230, 118, 0.2);
+}
+.list-item i {
+	font-size: 14px;
+	opacity: 0.7;
+}
+.list-item.active i {
+	opacity: 1;
+	color: var(--accent);
+}
+
+/* PANEL FOOTER INFO */
+.panel-footer-info {
+	padding: 10px 14px;
+	background: #0d0d0d;
+	font-size: 10px;
+	color: var(--text-dim);
+	font-family: monospace;
+	border-top: 1px solid var(--border-light);
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	margin-top: auto;
+}
+#current-context {
+	color: var(--accent);
+	font-weight: 600;
+}
+
+/* CANVAS & NODES */
+.canvas {
+	flex: 1;
+	background-color: var(--bg-canvas);
+	background-image: radial-gradient(#333 1px, transparent 1px);
+	background-size: 20px 20px;
+	position: relative;
+	overflow: hidden;
+}
+#canvas-container {
+	position: absolute;
+	transform-origin: 0 0;
+}
+.canvas-controls {
+	position: absolute;
+	bottom: 20px;
+	right: 20px;
+	display: flex;
+	gap: 10px;
+	pointer-events: none;
+}
+.hint-text {
+	background: rgba(0, 0, 0, 0.8);
+	padding: 6px 12px;
+	border-radius: 4px;
+	font-size: 11px;
+	color: #888;
+	border: 1px solid #333;
+}
+.zoom-btn {
+	pointer-events: auto;
+	width: 32px;
+	height: 32px;
+	background: #222;
+	border: 1px solid #333;
+	color: #fff;
+	cursor: pointer;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+/* NODES */
+.node-block {
+	position: absolute;
+	min-width: 180px;
+	background: var(--bg-node);
+	border-radius: 6px;
+	box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+	border: 1px solid #333;
+	z-index: 5;
+}
+.node-header {
+	padding: 6px 10px;
+	font-size: 12px;
+	font-weight: 600;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	border-radius: 6px 6px 0 0;
+	color: #fff;
+	cursor: grab;
+	background: linear-gradient(
+		to bottom,
+		rgba(255, 255, 255, 0.05),
+		transparent
+	);
+}
+.node-content {
+	padding: 8px;
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+}
+.input-row {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	color: #999;
+	font-size: 11px;
+}
+.node-input {
+	background: var(--bg-input);
+	border: 1px solid #333;
+	color: #eee;
+	padding: 3px 6px;
+	border-radius: 3px;
+	text-align: right;
+	font-size: 11px;
+	outline: none;
+	width: 60px;
+}
+.node-input:focus {
+	border-color: var(--accent);
+}
+input[type='color'] {
+	border: none;
+	padding: 0;
+	width: 20px;
+	height: 20px;
+	cursor: pointer;
+}
+
+/* TOOLBOX */
+#toolboxContent {
+	padding: 10px;
+	overflow-y: auto;
+	flex: 1;
+}
+.panel-header {
+	padding: 10px 15px;
+	font-size: 12px;
+	font-weight: 700;
+	color: #ccc;
+	background: #1f1f1f;
+	border-bottom: 1px solid #333;
+	display: flex;
+	align-items: center;
+	gap: 8px;
+}
+.category-title {
+	font-size: 10px;
+	color: #555;
+	margin: 15px 0 5px;
+	font-weight: 700;
+	text-transform: uppercase;
+}
+.tool-item {
+	padding: 6px 10px;
+	background: #1f1f1f;
+	border-radius: 4px;
+	cursor: grab;
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	font-size: 12px;
+	border: 1px solid #2a2a2a;
+	color: #ccc;
+	margin-bottom: 4px;
+}
+.tool-item:hover {
+	border-color: #555;
+	color: #fff;
+	transform: translateX(2px);
+}
+
+/* GAME WINDOW */
+#game-overlay {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background: rgba(0, 0, 0, 0.85);
+	z-index: 1000;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+.game-window {
+	width: 800px;
+	height: 600px;
+	background: #000;
+	border: 1px solid #333;
+	display: flex;
+	flex-direction: column;
+	border-radius: 8px;
+	overflow: hidden;
+}
+.game-header {
+	height: 40px;
+	background: #111;
+	display: flex;
+	justify-content: space-between;
+	padding: 0 15px;
+	align-items: center;
+	border-bottom: 1px solid #222;
+}
+.close-game-btn {
+	background: none;
+	border: none;
+	color: #666;
+	font-size: 20px;
+	cursor: pointer;
+}
+.close-game-btn:hover {
+	color: #fff;
+}
+#game-stage {
+	flex: 1;
+	background: #050505;
+	position: relative;
+	overflow: hidden;
+}
+#game-console {
+	height: 120px;
+	background: #0a0a0a;
+	color: #ccc;
+	padding: 10px;
+	font-family: monospace;
+	font-size: 11px;
+	overflow-y: auto;
+	border-top: 1px solid #222;
+}
+.game-sprite {
+	position: absolute;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-weight: bold;
+	box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+	user-select: none;
+}
+.hidden {
+	display: none !important;
+}
+
+/* --- ДЖОЙСТИК --- */
+.joystick-base {
+    position: absolute;
+    bottom: 30px;
+    left: 30px;
+    width: 120px;
+    height: 120px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    touch-action: none; /* Чтобы не скроллить экран */
+    display: none; /* Скрыт по умолчанию */
+    z-index: 100;
+}
+
+.joystick-stick {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 50px;
+    height: 50px;
+    background: rgba(0, 230, 118, 0.8);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    box-shadow: 0 0 10px rgba(0,0,0,0.5);
+    pointer-events: none;
+}
+
+/* ==========================================
+   --- CUSTOM SCROLLBARS (WEBKIT & FIREFOX) ---
+   ========================================== */
+
+/* Глобальная настройка для Firefox */
+* {
+    scrollbar-width: thin;
+    scrollbar-color: #444 var(--bg-panel);
+}
+
+/* Настройка для Chrome, Edge, Safari */
+::-webkit-scrollbar {
+    width: 10px;  /* Ширина вертикального скролла */
+    height: 10px; /* Высота горизонтального скролла */
+    background-color: var(--bg-panel); 
+}
+
+/* Фон дорожки (трека) */
+::-webkit-scrollbar-track {
+    background: transparent; 
+}
+
+/* Сам ползунок (thumb) */
+::-webkit-scrollbar-thumb {
+    background-color: #333; /* Цвет ползунка */
+    border-radius: 5px;     /* Закругление */
+    border: 2px solid var(--bg-panel); /* Отступ внутрь, создающий эффект "парящего" скролла */
+}
+
+/* Ползунок при наведении */
+::-webkit-scrollbar-thumb:hover {
+    background-color: #555; /* Чуть светлее при наведении */
+    border-color: var(--bg-panel);
+}
+
+/* Угол пересечения скроллов */
+::-webkit-scrollbar-corner {
+    background: var(--bg-panel);
+}
+
+/* --- Специфично для консоли, чтобы она выглядела как терминал --- */
+#game-console::-webkit-scrollbar-track {
+    background: #0a0a0a;
+}
+#game-console::-webkit-scrollbar-thumb {
+    border-color: #0a0a0a;
+}
+
+/* ==========================================
+   --- TEMPLATE CONTROLS (МЕНЮ ШАБЛОНОВ) ---
+   ========================================== */
+
+.template-controls {
+    /* Сетка для компактного размещения кнопок */
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* Две колонки */
+    gap: 8px; /* Отступ между элементами */
+    
+    background: var(--bg-panel);
+    border-top: 1px solid var(--border-light) !important;
+    padding: 15px 12px !important;
+    margin-top: auto !important;
+}
+
+/* Заголовок "Мои шаблоны" растягиваем на всю ширину */
+.template-controls p {
+    grid-column: 1 / -1;
+    margin: 0 0 4px 0 !important;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: var(--text-dim) !important;
+    letter-spacing: 0.5px;
+    padding-left: 2px;
+}
+
+/* Общий стиль кнопок */
+.template-controls button {
+    background: #1f1f1f;
+    border: 1px solid var(--border-light);
+    color: #ccc;
+    font-family: 'Inter', sans-serif;
+    font-size: 11px;
+    padding: 8px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center; /* Центруем контент */
+    gap: 6px;
+    transition: all 0.2s ease;
+    outline: none;
+    height: 32px;
+}
+
+/* Кнопка "В шаблон" - главная, на всю ширину */
+.template-controls button:first-of-type {
+    grid-column: 1 / -1;
+    background: rgba(0, 230, 118, 0.05); /* Легкий зеленый оттенок */
+    border-color: rgba(0, 230, 118, 0.2);
+    color: var(--accent);
+    justify-content: flex-start; /* Выравнивание по левому краю */
+    font-weight: 600;
+}
+
+/* Иконки */
+.template-controls button i {
+    font-size: 14px;
+    color: var(--text-dim);
+    transition: 0.2s;
+}
+
+/* Иконка у главной кнопки всегда зеленая */
+.template-controls button:first-of-type i {
+    color: var(--accent);
+}
+
+/* --- Эффекты наведения (Hover) --- */
+
+.template-controls button:hover {
+    background: #2a2a2a;
+    border-color: #555;
+    color: #fff;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+.template-controls button:hover i {
+    color: #fff;
+}
+
+/* Специфичный ховер для главной кнопки */
+.template-controls button:first-of-type:hover {
+    background: rgba(0, 230, 118, 0.15);
+    border-color: var(--accent);
+    color: #fff;
+}
+
+/* Эффект нажатия (Active) */
+.template-controls button:active {
+    transform: translateY(1px);
+    box-shadow: none;
+    opacity: 0.8;
+}
+
+/* ==========================================
+   --- CUSTOM MODAL (ЗАМЕНА PROMPT) ---
+   ========================================== */
+
+/* Затемнение фона */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6); /* Полупрозрачный черный */
+    backdrop-filter: blur(2px); /* Легкое размытие фона */
+    z-index: 2000; /* Поверх всего */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+}
+
+/* Показываем окно (класс active убирает прозрачность) */
+.modal-overlay.active {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+/* Само окно */
+.modal-window {
+    background: #2b2b2b; /* Цвет как на скриншоте */
+    width: 400px;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    border: 1px solid #444;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    transform: scale(0.95);
+    transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.modal-overlay.active .modal-window {
+    transform: scale(1);
+}
+
+/* Заголовки */
+.modal-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #fff;
+}
+
+.modal-message {
+    font-size: 13px;
+    color: #ccc;
+    margin-top: -10px;
+}
+
+/* Поле ввода */
+.modal-input {
+    background: #1a1a1a;
+    border: 1px solid #333;
+    color: #fff;
+    padding: 10px 12px;
+    border-radius: 6px;
+    font-size: 14px;
+    outline: none;
+    font-family: 'Inter', sans-serif;
+    transition: border-color 0.2s;
+}
+
+.modal-input:focus {
+    border-color: #00e676; /* Цвет акцента при фокусе */
+}
+
+/* Кнопки */
+.modal-buttons {
+    display: flex;
+    justify-content: flex-end; /* Кнопки справа */
+    gap: 10px;
+    margin-top: 5px;
+}
+
+.modal-btn {
+    border: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    transition: 0.2s;
+}
+
+/* Кнопка "Продолжить" (Светлая) */
+.modal-btn.primary {
+    background: #e0e0e0;
+    color: #000;
+}
+
+.modal-btn.primary:hover {
+    background: #fff;
+    box-shadow: 0 0 10px rgba(255,255,255,0.2);
+}
+
+/* Кнопка "Отмена" (Темная) */
+.modal-btn.secondary {
+    background: #3a3a3a;
+    color: #ccc;
+    border: 1px solid #444;
+}
+
+.modal-btn.secondary:hover {
+    background: #444;
+    color: #fff;
+}
+
+/* ===== MENU BAR ===== */
+.menu-bar {
+    display: flex;
+    align-items: center;
+}
+
+.menu-item {
+    position: relative;
+    font-size: 13px;
+    color: var(--text-main);
+    padding: 6px 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.menu-item:hover {
+    background: #2a2a2a;
+}
+
+.menu-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    margin-top: 6px;
+    background: #1b1b1b;
+    border: 1px solid #333;
+    border-radius: 8px;
+    min-width: 220px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+    display: none;
+    flex-direction: column;
+    padding: 6px;
+    z-index: 100;
+}
+
+.menu-item.open .menu-dropdown {
+    display: flex;
+}
+
+.menu-entry {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 10px;
+    font-size: 12px;
+    color: #ddd;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.menu-entry span {
+    margin-left: auto;
+    font-size: 10px;
+    color: #777;
+}
+
+.menu-entry:hover {
+    background: #2a2a2a;
+    color: #fff;
+}
+
+.menu-entry.disabled {
+    opacity: 0.4;
+    pointer-events: none;
+}
+
+.menu-separator {
+    height: 1px;
+    background: #333;
+    margin: 6px 4px;
+}
+
+/* HEADER LEFT (LOGO + MENU) */
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
