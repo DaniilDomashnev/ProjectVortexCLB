@@ -820,6 +820,7 @@ const objectListEl = document.getElementById('objectList')
 window.addEventListener('DOMContentLoaded', () => {
 	loadCustomTemplates()
 	initToolbox()
+	initMobileLibrary()
 	initCanvasEvents()
 	renderSidebar()
 	loadWorkspace()

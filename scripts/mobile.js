@@ -102,3 +102,169 @@
 		})
 	})
 })()
+
+// ==========================================
+// --- 5. МОБИЛЬНАЯ БИБЛИОТЕКА ---
+// ==========================================
+
+function initMobileLibrary() {
+    const fab = document.getElementById('fabAddBlock');
+    const overlay = document.getElementById('library-overlay');
+    const closeBtn = document.getElementById('btnCloseLib');
+    const catContainer = document.getElementById('libCategories');
+    const gridContainer = document.getElementById('libGrid');
+
+    // Открытие
+    fab.onclick = () => {
+        overlay.classList.remove('hidden');
+        renderLibCategories(); // Рисуем категории при открытии
+    }
+
+    // Закрытие
+    closeBtn.onclick = () => overlay.classList.add('hidden');
+
+    // Функция рендера категорий
+    function renderLibCategories() {
+        catContainer.innerHTML = '';
+        
+        // Получаем уникальные категории
+        const categories = [...new Set(BLOCK_DEFINITIONS.map(b => b.category))];
+        // Добавляем Шаблоны вручную в конец, если их нет
+        if(!categories.includes('Шаблоны')) categories.push('Шаблоны');
+
+        let isFirst = true;
+
+        categories.forEach(cat => {
+            const el = document.createElement('div');
+            el.className = 'lib-cat-item';
+            
+            // Иконка для категории (условная логика)
+            let icon = 'ri-function-line';
+            if(cat === 'События') icon = 'ri-flag-fill';
+            if(cat === 'Окно') icon = 'ri-window-line';
+            if(cat === 'Физика') icon = 'ri-basketball-line';
+            if(cat === 'Логика') icon = 'ri-git-branch-line';
+            if(cat === 'Внешность') icon = 'ri-palette-line';
+
+            el.innerHTML = `<i class="${icon}"></i><span>${cat}</span>`;
+            
+            el.onclick = () => {
+                // Подсветка активной
+                document.querySelectorAll('.lib-cat-item').forEach(i => i.classList.remove('active'));
+                el.classList.add('active');
+                renderLibBlocks(cat);
+            };
+
+            catContainer.appendChild(el);
+
+            if(isFirst) {
+                el.click(); // Выбираем первую категорию сразу
+                isFirst = false;
+            }
+        });
+    }
+
+    // Функция рендера блоков
+    function renderLibBlocks(category) {
+        gridContainer.innerHTML = '';
+
+        // Фильтруем блоки
+        let blocks = BLOCK_DEFINITIONS.filter(b => b.category === category);
+        
+        // Если категория Шаблоны - добавляем кастомные
+        if(category === 'Шаблоны') {
+            // Стандартные шаблоны уже есть в BLOCK_DEFINITIONS с category='Шаблоны'
+            // Добавим пользовательские
+            Object.keys(customTemplates).forEach(key => {
+                const tmpl = customTemplates[key];
+                blocks.push({
+                    id: key, // Ключ шаблона
+                    label: tmpl.name,
+                    icon: 'ri-star-fill',
+                    color: '#FFD700',
+                    isCustom: true
+                });
+            });
+        }
+
+        blocks.forEach(def => {
+            const card = document.createElement('div');
+            card.className = 'lib-block-card';
+            card.innerHTML = `
+                <div class="lib-block-icon">
+                    <i class="${def.icon}" style="color:${def.color}"></i>
+                </div>
+                <div class="lib-block-name">${def.label}</div>
+            `;
+            
+            // КЛИК ПО БЛОКУ -> ДОБАВИТЬ В ЦЕНТР ЭКРАНА
+            card.onclick = () => {
+                addBlockToCenter(def);
+                overlay.classList.add('hidden'); // Закрыть меню
+            };
+
+            gridContainer.appendChild(card);
+        });
+    }
+
+    function addBlockToCenter(def) {
+        // Вычисляем центр видимой области холста с учетом панорамирования (panX, panY)
+        // container rect не нужен, считаем от центра окна браузера
+        const rect = canvas.getBoundingClientRect();
+        
+        // Центр экрана относительно canvas-container
+        const centerX = (-panX + rect.width / 2) - 100; // -100 смещение чтобы встал ровно
+        const centerY = (-panY + rect.height / 2) - 50;
+
+        if (def.isCustom) {
+            // Это пользовательский шаблон
+            const templateData = customTemplates[def.id].data;
+             // Находим левую верхнюю точку шаблона
+            let minX = Infinity, minY = Infinity;
+            templateData.forEach(b => {
+                if (b.x < minX) minX = b.x;
+                if (b.y < minY) minY = b.y;
+            });
+            // Создаем
+            templateData.forEach(blockData => {
+                const offsetX = blockData.x - minX;
+                const offsetY = blockData.y - minY;
+                createBlock(blockData.type, 0, 0, {
+                    ...blockData,
+                    x: centerX + offsetX,
+                    y: centerY + offsetY
+                });
+            });
+        } else if (TEMPLATES[def.id]) {
+            // Это встроенный шаблон (Clicker и т.д.)
+            TEMPLATES[def.id].forEach(blockData => {
+                 createBlock(blockData.type, 0, 0, {
+                    ...blockData,
+                     // Просто спавним их кучей в центре, или используем их относительные координаты
+                     // Для простоты, если у них есть координаты в конфиге, они переопределят это
+                     // Но в createBlock мы передаем restoreData, если хотим точные.
+                     // Здесь просто перезапишем координаты со смещением
+                 });
+                 // Фикс: для встроенных шаблонов лучше использовать их родные координаты + смещение, 
+                 // но пока просто создадим как есть (логика createBlock обработает).
+                 // Чтобы работало корректно, лучше пройтись по массиву и добавить смещение:
+            });
+            // Перезапуск для корректной вставки шаблона
+             TEMPLATES[def.id].forEach((b, i) => {
+                 // хак: сдвигаем их немного
+                 createBlock(b.type, 0, 0, {
+                     ...b,
+                     x: centerX + (i*10), 
+                     y: centerY + (i*10)
+                 });
+             })
+        } else {
+            // Обычный блок
+            createBlock(def.id, 0, 0, {
+                values: def.inputs ? def.inputs.map(i => i.default) : [], // Дефолтные значения
+                x: centerX,
+                y: centerY
+            });
+        }
+    }
+}

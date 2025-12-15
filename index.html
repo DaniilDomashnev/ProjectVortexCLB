@@ -192,6 +192,27 @@
         </div>
     </div>
 
+    <button id="fabAddBlock" class="fab-btn" title="Добавить блок">
+        <i class="ri-add-line"></i>
+    </button>
+    
+    <div id="library-overlay" class="modal-overlay hidden">
+        <div class="library-window">
+            <div class="library-header">
+                <span style="display:flex; align-items:center; gap:10px;">
+                    <i class="ri-function-line" style="color:#00e676"></i>
+                    Библиотека
+                </span>
+                <button id="btnCloseLib" class="close-game-btn"><i class="ri-close-line"></i></button>
+            </div>
+    
+            <div class="library-body">
+                <div class="lib-sidebar" id="libCategories"></div>
+                <div class="lib-content" id="libGrid"></div>
+            </div>
+        </div>
+    </div>
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 
     <script src="script.js"></script>
